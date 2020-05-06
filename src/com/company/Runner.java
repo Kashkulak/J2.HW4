@@ -1,46 +1,72 @@
 package com.company;
 
 public class Runner extends Thread {
-    private String name;
-    private int number = 2;
-
-    public int getNumber() {
-        return number++;
-    }
+    private volatile Runner runnerF;
+    private volatile Runner runnerS;
 
     public Runner(String name) {
-        this.name = name;
+        super(name);
     }
 
+    public void setRunnerFS(Runner runnerF, Runner runnerS) {
+        this.runnerF = runnerF;
+        this.runnerS = runnerS;
+    }
+
+    @Override
     public synchronized void run() {
+        cattyFuzzy();
+    }
 
-        for (int i = 1; i <= 5; i++) {
-
-            System.out.print(name + i + " берет палочку\n");
-            if (number<6) {
-                System.out.println(name + i + " бежит к " + name + getNumber());
-            }
-            else if (number >5) {
-                System.out.println(name + i + " бежит к финишу");
-            }
-            try {
-                sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            System.out.println("");
+    public synchronized void cattyFuzzy() {
+        System.out.println(getName() + " берет палочку");
+        try {
+            sleep(500);
+        } catch (InterruptedException ignored) {
         }
-        number--;
 
-        for (int i = 5; i > 0; i--) {
-            number--;
-            if (number>0)
-                System.out.println(name + i + " бежит к "+name+number+"\n"+name+number+" берет палочку\n");
+        if (getName().equals("runner5")) {
+            System.out.println(getName() + " бежит к финишу");
             try {
                 sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (InterruptedException ignored) {
             }
+
+            System.out.println(getName() + " бежит к " + runnerS.getName()); // поменял букву R на S
+
+            try {
+                sleep(5000);
+            } catch (InterruptedException ignored) {
+            }
+
+        } else {
+            System.out.println(getName() + " бежит к " + runnerF.getName());
+            try {
+                sleep(5000);
+            } catch (InterruptedException ignored) {
+            }
+            runnerF.start();
+            try {
+                runnerF.join();
+            } catch (InterruptedException ignored) {
+            }
+        }
+        if (!getName().equals("runner5")) {
+            System.out.println(getName() + " берет палочку");
+        }
+
+        try {
+            sleep(500);
+        } catch (InterruptedException ignored) {
+        }
+
+        if (!(getName().equals("runner1")) && !getName().equals("runner5")) {
+            System.out.println(getName() + " бежит к " + runnerS.getName());
+        }
+        try {
+            sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }
